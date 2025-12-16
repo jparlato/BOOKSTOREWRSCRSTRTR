@@ -1,3 +1,13 @@
+@if(state.searchResult.isLoading()) {
+  <app-busy/>
+}
+<!-- <pre>{{state.searchResult.value().length}}</pre> -->
+
+<!-- @if(state.searchResult.value().length === 0 ) {
+  <div class="error-message">
+    No results!
+  </div>
+} -->
 <div class="scrollable">
   @for(b of state.searchResult.value(); track b.id) {
   <div

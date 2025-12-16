@@ -1,5 +1,6 @@
 import { Injectable, resource, signal } from '@angular/core';
 import { Book } from '../models/book';
+import { httpResource } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -10,11 +11,21 @@ export class StateService {
 
   #keyword = signal<string>('the');
 
-  #searchResult = resource({
-    params: () => ({keyword: this.#keyword()}),
-    loader: (options) => this.#searchKeywordPromise(options.params.keyword),
-    defaultValue: [] as Book[]
-  });
+  // #searchResult = resource({
+  //   params: () => ({keyword: this.#keyword()}),
+  //   loader: (options) => this.#searchKeywordPromise(options.params.keyword, options.abortSignal),
+  //   defaultValue: [] as Book[]
+  // });
+
+
+  #searchResult = httpResource<Book[]>(() => ({
+    url: `${this.#apiBase}/search`,
+    params: { q: this.#keyword() },
+  }),
+    {
+      defaultValue: [] as Book[]
+
+    })
 
   get searchResult() {
     return this.#searchResult.asReadonly();
@@ -29,9 +40,9 @@ export class StateService {
     this.#keyword.set(value);
   }
 
-  #searchKeywordPromise(value: string): Promise<Book[]> {
-    return fetch(`${this.#apiBase}/search?q=${value}`).then(res => res.json());
-  } 
+  #searchKeywordPromise(value: string, abortSignal?: AbortSignal): Promise<Book[]> {
+    return fetch(`${this.#apiBase} / search ? q = ${value}`, { signal: abortSignal }).then(res => res.json());
+  }
 
   constructor() { }
 }
